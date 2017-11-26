@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Hackathon";
+}
+<h3>@ViewData["Message"]</h3>
+
+<div class="row">
+    <div class="col-md-5">
+        <h2>Enter Your Team</h2>
+        <form asp-controller="Team" asp-action="RegisterTeam" method="POST">
+            <input type="hidden" name="competition" value="@ViewBag.selectedComp">
+            <div class="form-group">
+                <label for="name">Team Name</label>
+                <input type="text" name="name" class="form-control" value="">
+            </div>
+            <div class="form-group">
+                <label for="title">Project Title</label>
+                <input type="text" name="title" class="form-control" value="">
+            </div>
+            <div class="form-group">
+                <label for="members">Select Up To 2 Additional Team Members</label>
+                <label for="">(logged in user is automatically added)</label>
+                <select name="members" class="form-control" multiple>
+                    @foreach (var s in ViewBag.allStudents) {
+                        <option value="@s.UserId">@s.FirstName @s.LastName</option>
+                    }
+                </select>
+            </div>
+            <input type="submit" value="Register" class="btn btn-success">
+        </form>
+    </div>
+
+    <div class="col-md-5">
+        <h2>Leaderboard</h2>
+    </div>
+</div>

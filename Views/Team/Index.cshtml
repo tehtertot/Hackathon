@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Hackathon";
+}
+<h3>@ViewData["Message"]</h3>
+
+<h3>Join a Competition:</h3>
+<form asp-controller="Team" asp-action="MakeTeam" method="POST">
+    <div class="form-group">
+        <select name="competition" class="form-control">
+            @foreach (var c in ViewBag.currentCompetitions) {
+                <option value="@c.CompetitionId">@c</option>
+            }
+        </select>
+        <input type="submit" value="Join" class="btn btn-warning">
+    </div>
+</form>
+
+<h3>My Current Teams:</h3>
+@foreach (var t in ViewBag.currentTeams) {
+    <p><a href="">@t</a></p>
+}
