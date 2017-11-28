@@ -24,6 +24,33 @@ namespace Hackathon.Factories
             }
         }
 
+        public IEnumerable<User> GetAll()
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = "SELECT * FROM users";
+                dbConnection.Open();
+                return dbConnection.Query<User>(query);
+            }
+        }
+
+        public User GetUserById(int id)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM users WHERE UserId={id};";
+                dbConnection.Open();
+                return dbConnection.Query<User>(query).SingleOrDefault();
+            }
+        }
+
+        public void UpdateUserPassword(User u) 
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = "UPDATE users SET Password=@Password, ChangePassword=0 WHERE UserId=@UserId";
+                dbConnection.Open();
+                dbConnection.Execute(query, u);
+            }
+        }
+
         public User LoginUser(User u)
         {
             using (IDbConnection dbConnection = Connection) {

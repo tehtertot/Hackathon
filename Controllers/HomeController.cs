@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Hackathon.Factories;
 using Hackathon.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hackathon.Controllers
 {
@@ -37,12 +38,17 @@ namespace Hackathon.Controllers
             if (loggingIn == null) {
                 return RedirectToAction("ShowLogin");
             }
-            if (loggingIn.Password == u.Password) {
+            PasswordHasher<User> Hasher = new PasswordHasher<User>();
+            if (Hasher.VerifyHashedPassword(loggingIn, loggingIn.Password, u.Password) != 0) {
                 //if user level is an admin
                 HttpContext.Session.SetInt32("AccessLevel", loggingIn.AccessLevelId);
                 HttpContext.Session.SetInt32("UserId", loggingIn.UserId);
                 HttpContext.Session.SetString("Username", loggingIn.FirstName);
                 HttpContext.Session.SetInt32("CurrStackId", _userFactory.GetCurrentStackId(loggingIn.UserId));
+                if (loggingIn.ChangePassword) {
+                    return RedirectToAction("ShowPasswordUpdate");
+                }
+
                 if (loggingIn.AccessLevelId == 9) {
                     return RedirectToAction("AdminNav", "Admin");
                 }
@@ -52,6 +58,36 @@ namespace Hackathon.Controllers
                 }
             }
             return RedirectToAction("ShowLogin", "Home");
+        }
+
+        public IActionResult ShowPasswordUpdate() {
+            return View("UpdatePassword");
+        }
+
+        public IActionResult UpdatePassword(ChangePassword cp) {
+            if (ModelState.IsValid) {
+                PasswordHasher<User> Hasher = new PasswordHasher<User>();
+                User u = _userFactory.GetUserById((int)HttpContext.Session.GetInt32("UserId"));
+                if (Hasher.VerifyHashedPassword(u, u.Password, cp.CurrentPassword) != 0)
+                {
+                    u.Password = Hasher.HashPassword(u, cp.NewPassword);
+                    _userFactory.UpdateUserPassword(u);
+                    if (HttpContext.Session.GetInt32("AccessLevel") == 9) {
+                        return RedirectToAction("AdminNav", "Admin");
+                    }
+                    else {
+                        return RedirectToAction("Index", "Team");
+                    }
+
+                }
+                else {
+                    TempData["mismatch"] = "Current password is incorrect";
+                    return View();
+                }
+            }
+            else {
+                return View();
+            }
         }
 
         public IActionResult About()
@@ -74,5 +110,14 @@ namespace Hackathon.Controllers
             ViewData["UserLevel"] = 0;
             return View();
         }
+
+        // private void HashAllPasswords() {
+        //     IEnumerable<User> allUsers = _userFactory.GetAll();
+        //     PasswordHasher<User> Hasher = new PasswordHasher<User>();
+        //     foreach (User u in allUsers) {
+        //         u.Password = Hasher.HashPassword(u, u.Password);
+        //         _userFactory.UpdateUser(u);
+        //     }
+        // }
     }
 }

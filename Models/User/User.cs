@@ -15,9 +15,11 @@ namespace Hackathon.Models
         public string Email { get; set; }
         
         public string Password { get; set; }
+        public bool ChangePassword { get; set; }
         
         public int AccessLevelId { get; set; }
         public AccessLevel Access { get; set; }
+
 
         public override string ToString() 
         {

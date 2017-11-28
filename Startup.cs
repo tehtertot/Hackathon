@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Hackathon.Factories;
+using Hackathon.Models;
 
 namespace Hackathon
 {
@@ -29,6 +30,7 @@ namespace Hackathon
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<MySqlOptions>(Configuration.GetSection("DBInfo"));
+            // services.AddScoped<IFactory<BaseEntity>>();
             services.AddScoped<UserFactory>();
             services.AddScoped<CompetitionFactory>();
             services.AddScoped<StackFactory>();

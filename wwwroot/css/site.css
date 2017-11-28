@@ -39,3 +39,12 @@ textarea {
 .rederror { 
     color: red;
 }
+
+.topbuffer {
+    margin-top: 20px;
+}
+
+.standard-form {
+    margin-left: 5%;
+    width: 50%;
+}
