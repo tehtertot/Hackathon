@@ -52,6 +52,24 @@ namespace Hackathon.Factories
             }
         }
 
+        public int GetStudentTeamId(int userId, int compId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT studentteams.TeamId FROM studentteams JOIN teams ON studentteams.teamId = teams.TeamId WHERE studentteams.studentid={userId} AND teams.CompetitionId={compId};";
+                dbConnection.Open();
+                return dbConnection.Query<int>(query).SingleOrDefault();
+            }
+        }
+
+        public void SaveVote(int userId, int teamId, int studTeam) 
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"UPDATE studentteams SET studentvoteteamid={teamId} WHERE UserId={userId} AND TeamId={studTeam};";
+                dbConnection.Open();
+                dbConnection.Execute(query);
+            }
+        }
+
         public Competition GetCompetition(int id)
         {
             using (IDbConnection dbConnection = Connection) {
@@ -59,7 +77,15 @@ namespace Hackathon.Factories
                 // string query = $"SELECT * FROM competitions JOIN teams ON competitions.CompetitionId = teams.CompetitionId JOIN studentteams ON teams.TeamId = studentteams.TeamId WHERE CompetitionId = {id}";
                 dbConnection.Open();
                 // return dbConnection.Query<Competition, Team, StudentTeam, Competition>(query, (c, t, st) => {c.Teams = t; return c; }).SingleOrDefault();
-                return dbConnection.Query<Competition>(query).SingleOrDefault();
+                Competition c = dbConnection.Query<Competition>(query).SingleOrDefault();
+                string query2 = $"SELECT * FROM teams WHERE CompetitionId={c.CompetitionId};";
+                c.Teams = dbConnection.Query<Team>(query2).ToList();
+                foreach (Team t in c.Teams)
+                {
+                    string query3 = $"SELECT * FROM studentteams JOIN students ON studentteams.studentid = students.userid JOIN users ON students.userid = users.userid WHERE TeamId={t.TeamId};";
+                    t.Students = dbConnection.Query<StudentTeam, Student, User, Student>(query3, (st, s, u) => { s.UserInfo = u; return s; }, splitOn:"UserId").ToList();
+                }
+                return c;
             }
         }
 

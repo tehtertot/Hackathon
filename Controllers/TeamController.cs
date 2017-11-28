@@ -91,10 +91,33 @@ namespace Hackathon.Controllers
         public IActionResult ViewCompetition(int compId) 
         {
             Competition c = _compFactory.GetCompetition(compId);
-            // if (c.End > DateTime.Now)
-            // {
-            return View("ShowCompetition", c);
-            // }
+            //page displaying competition details, including teams and players
+            //allowing 5 minutes per presentation
+            if (c.End > DateTime.Now.AddMinutes(c.Teams.Count*5))
+            {
+                return View("ShowCompetition", c);
+            }
+
+            //viewing for voting
+            ViewBag.userTeamId = _compFactory.GetStudentTeamId((int)HttpContext.Session.GetInt32("UserId"), compId);
+            return View("Vote", c);
+        }
+
+        public IActionResult Vote(int team, int compId)
+        {
+            if (CheckUser()) {
+                int studTeam = _compFactory.GetStudentTeamId((int)HttpContext.Session.GetInt32("UserId"), compId);
+                if (team == studTeam) {
+                    TempData["error"] = "Cannot vote for yourself!";
+                    return RedirectToAction("ViewCompetition");
+                }
+                _compFactory.SaveVote((int)HttpContext.Session.GetInt32("UserId"), team, studTeam);
+
+                return RedirectToAction("ViewCompetition");
+            }
+            else {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public IActionResult Error()

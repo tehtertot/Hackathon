@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Hackathon";
+}
+
+@model Hackathon.Models.Competition
+
+<h2>@Model.CompetitionName</h2>
+<h4>START: @Model.Start.ToString("f")</h4>
+<h4>END: @Model.End.ToString("f")</h4>
+<hr>
+<h4>Teams</h4>
+<p class="rederror">@TempData["error"]</p>
+<form asp-controller="Team" asp-action="Vote" method="POST">
+    <input type="hidden" value=@Model.CompetitionId name="compId">
+    @foreach (var t in Model.Teams){
+        <div class="row topbuffer standard-form"> 
+        @if (t.TeamId != ViewBag.UserTeamId) {
+            <input type="radio" name="team" value=@t.TeamId><h5 class="teamname"> @t.TeamName - @t.ProjectTitle</h5>
+            <ul>
+            @foreach (var s in t.Students) {
+                <li>@s.UserInfo.FirstName</li>
+            }
+            </ul>
+        }
+        </div>
+    }
+    <div class="row topbuffer">
+        <input type="submit" value="Vote!" class="btn btn-success standard-form">
+    </div>
+</form>

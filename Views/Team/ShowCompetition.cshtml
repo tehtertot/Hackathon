@@ -9,3 +9,13 @@
 <h4>END: @Model.End.ToString("f")</h4>
 <hr>
 <p>Voting will begin after presentations...</p>
+<h4>Teams</h4>
+<ul>
+@foreach (var t in Model.Teams){
+    <li>@t.TeamName - @t.ProjectTitle (
+        @foreach (var s in t.Students) {
+            <span>  @s.UserInfo.FirstName  </span>
+        }
+    )</li>
+}
+</ul>
