@@ -78,7 +78,6 @@ namespace Hackathon.Controllers
                     else {
                         return RedirectToAction("Index", "Team");
                     }
-
                 }
                 else {
                     TempData["mismatch"] = "Current password is incorrect";
@@ -90,12 +89,10 @@ namespace Hackathon.Controllers
             }
         }
 
-        public IActionResult About()
+        public IActionResult Logout()
         {
-            ViewData["UserLevel"] = 0;
-            //hackathon descriptor?
-
-            return View();
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index","Home");
         }
 
         public IActionResult Contact()
