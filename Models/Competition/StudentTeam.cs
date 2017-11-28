@@ -7,5 +7,8 @@ namespace Hackathon.Models
 
         public int TeamId { get; set; }
         public Team Team { get; set; }
+
+        public int StudentTeamVoteId { get; set; }
+        public Team VotedFor { get; set; }
     }
 }

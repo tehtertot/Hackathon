@@ -48,3 +48,7 @@ textarea {
     margin-left: 5%;
     width: 70%;
 }
+
+.img-responsive {
+    margin: auto;
+}

@@ -95,13 +95,6 @@ namespace Hackathon.Controllers
             return RedirectToAction("Index","Home");
         }
 
-        public IActionResult Contact()
-        {
-            ViewData["UserLevel"] = 0;
-            
-            return View();
-        }
-
         public IActionResult Error()
         {
             ViewData["UserLevel"] = 0;

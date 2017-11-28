@@ -19,7 +19,7 @@ namespace Hackathon.Models
 
         public override string ToString()
         {
-            return $"{TeamName} - {ProjectTitle}";
+            return $"{Competition.CompetitionName} Competition: {TeamName} - {ProjectTitle}";
         }
     }
 }
