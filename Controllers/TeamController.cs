@@ -35,6 +35,7 @@ namespace Hackathon.Controllers
             }
         }
 
+        [HttpPost]
         public IActionResult MakeTeam(int competition)
         {
             if (CheckUser()) 
@@ -52,6 +53,7 @@ namespace Hackathon.Controllers
             }
         }
 
+        [HttpPost]
         public IActionResult RegisterTeam(string name, string title, List<int> members, int competition)
         {
             if (CheckUser()) 
@@ -88,6 +90,39 @@ namespace Hackathon.Controllers
             }
         }
 
+        public IActionResult Edit(int teamId)
+        {
+            if (CheckUser())
+            {
+                Team team = _compFactory.GetTeam(teamId, (int)HttpContext.Session.GetInt32("UserId"));
+                return View("EditTeam", team);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult EditTeam(Team t)
+        {
+            if (CheckUser())
+            {
+                Team userTeam = _compFactory.GetTeam(t.TeamId, (int)HttpContext.Session.GetInt32("UserId"));
+                if (userTeam != null) 
+                {
+                    userTeam.TeamName = t.TeamName;
+                    userTeam.ProjectTitle = t.ProjectTitle;
+                    _compFactory.UpdateTeam(userTeam);
+                }
+                return RedirectToAction("Index", "Team");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
         public IActionResult ViewCompetition(int compId) 
         {
             Competition c = _compFactory.GetCompetition(compId);
@@ -103,6 +138,7 @@ namespace Hackathon.Controllers
             return View("Vote", c);
         }
 
+        [HttpPost]
         public IActionResult Vote(int team, int compId)
         {
             if (CheckUser()) {

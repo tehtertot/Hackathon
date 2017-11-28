@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Hackathon";
+}
+
+@model Hackathon.Models.Team
+
+<div class="row">
+    <div class="col-md-5">
+        <h2>Edit Team</h2>
+        <form asp-controller="Team" asp-action="EditTeam" method="POST">
+            <input type="hidden" name="TeamId" value="@Model.TeamId">
+            <div class="form-group">
+                <label for="name">Team Name</label>
+                <input type="text" name="TeamName" class="form-control" value="@Model.TeamName">
+            </div>
+            <div class="form-group">
+                <label for="title">Project Title</label>
+                <input type="text" name="ProjectTitle" class="form-control" value="@Model.ProjectTitle">
+            </div>
+            <input type="submit" value="Update" class="btn btn-error">
+        </form>
+    </div>
+
+    <div class="col-md-5">
+        <h2>Leaderboard</h2>
+    </div>
+</div>

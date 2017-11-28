@@ -52,6 +52,15 @@ namespace Hackathon.Factories
             }
         }
 
+        public Team GetTeam(int teamId, int userId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM teams JOIN studentteams ON studentteams.teamid=teams.teamid WHERE studentteams.studentid={userId} AND teams.teamid={teamId};";
+                dbConnection.Open();
+                return dbConnection.Query<Team, StudentTeam, Team>(query, (t, st) => { return t; }, splitOn: "TeamId").SingleOrDefault();
+            }
+        }
+
         public int GetStudentTeamId(int userId, int compId)
         {
             using (IDbConnection dbConnection = Connection) {
@@ -123,6 +132,15 @@ namespace Hackathon.Factories
                 dbConnection.Open();
                 dbConnection.Execute(query, t);
                 return dbConnection.Query<int>("SELECT last_insert_id();").SingleOrDefault();
+            }
+        }
+
+        public void UpdateTeam(Team t)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = "UPDATE teams SET TeamName=@TeamName, ProjectTitle=@ProjectTitle WHERE TeamId=@TeamId;";
+                dbConnection.Open();
+                dbConnection.Execute(query, t);
             }
         }
 
