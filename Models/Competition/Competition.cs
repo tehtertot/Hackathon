@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hackathon.Models
@@ -22,6 +23,13 @@ namespace Hackathon.Models
         public int CompetitionTypeId { get; set; }
         public CompetitionType CompType { get; set; }
 
+        public List<Team> Teams { get; set; }
+
+        public Competition()
+        {
+            Teams = new List<Team>();
+        }
+        
         public override string ToString()
         {
             return $"{CompetitionName}";

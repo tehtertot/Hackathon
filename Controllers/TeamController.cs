@@ -88,6 +88,15 @@ namespace Hackathon.Controllers
             }
         }
 
+        public IActionResult ViewCompetition(int compId) 
+        {
+            Competition c = _compFactory.GetCompetition(compId);
+            // if (c.End > DateTime.Now)
+            // {
+            return View("ShowCompetition", c);
+            // }
+        }
+
         public IActionResult Error()
         {
             CheckUser();

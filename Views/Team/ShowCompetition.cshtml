@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Hackathon";
+}
+
+@model Hackathon.Models.Competition
+
+<h2>@Model.CompetitionName</h2>
+<h4>START: @Model.Start.ToString("f")</h4>
+<h4>END: @Model.End.ToString("f")</h4>
+<hr>
+<p>Voting will begin after presentations...</p>

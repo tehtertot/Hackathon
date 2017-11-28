@@ -48,15 +48,17 @@ namespace Hackathon.Factories
             using (IDbConnection dbConnection = Connection) {
                 string query = $"SELECT * FROM studentTeams JOIN teams ON studentTeams.TeamId = teams.TeamId JOIN competitions ON teams.CompetitionId = competitions.CompetitionId WHERE StudentId = {userId} AND competitions.end > now();";
                 dbConnection.Open();
-                return dbConnection.Query<StudentTeam, Team, Team>(query, (st, t) => {return t;}, splitOn: "TeamId");
+                return dbConnection.Query<StudentTeam, Team, Competition, Team>(query, (st, t, c) => { t.Competition=c; return t; }, splitOn: "TeamId, CompetitionId");
             }
         }
 
         public Competition GetCompetition(int id)
         {
             using (IDbConnection dbConnection = Connection) {
-                string query = $"SELECT * FROM competitions WHERE CompetitionId = {id}";
+                string query = $"SELECT * FROM competitions where CompetitionId={id};";
+                // string query = $"SELECT * FROM competitions JOIN teams ON competitions.CompetitionId = teams.CompetitionId JOIN studentteams ON teams.TeamId = studentteams.TeamId WHERE CompetitionId = {id}";
                 dbConnection.Open();
+                // return dbConnection.Query<Competition, Team, StudentTeam, Competition>(query, (c, t, st) => {c.Teams = t; return c; }).SingleOrDefault();
                 return dbConnection.Query<Competition>(query).SingleOrDefault();
             }
         }
