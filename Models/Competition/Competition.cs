@@ -25,6 +25,8 @@ namespace Hackathon.Models
 
         public List<Team> Teams { get; set; }
 
+        public Team StudentTeam { get; set; }
+
         public Competition()
         {
             Teams = new List<Team>();

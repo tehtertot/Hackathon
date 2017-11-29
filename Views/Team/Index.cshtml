@@ -20,6 +20,10 @@
 </form>
 
 <h3>My Current Competitions:</h3>
-@foreach (var t in ViewBag.currentTeams) {
-    <p><a asp-controller="Team" asp-action="ViewCompetition" asp-route-compId="@t.CompetitionId">@t</a> <a asp-controller="Team" asp-action="Edit" asp-route-teamId="@t.TeamId" class="btn btn-default">Edit</a></p>
+@foreach (var c in ViewBag.votingCompetitions) {
+    <p><a asp-controller="Team" asp-action="ViewCompetition" asp-route-compId="@c.CompetitionId">@c</a>
+    @if (c.StudentTeam != null) {
+        <a asp-controller="Team" asp-action="Edit" asp-route-teamId="@c.StudentTeam.TeamId" class="btn btn-default">Edit</a>
+    }
+    </p>
 }

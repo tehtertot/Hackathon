@@ -25,6 +25,20 @@ namespace Hackathon.Factories
             }
         }
 
+        //************************************************//
+        //**************** COMPETITIONS ******************//
+        //************************************************//
+
+        public int SaveCompetition(Competition c)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = "INSERT INTO competitions (CompetitionName, MaxSize, Start, End, CompetitionTypeId) VALUES (@CompetitionName, @MaxSize, @Start, @End, @CompetitionTypeId);";
+                dbConnection.Open();
+                dbConnection.Execute(query, c);
+                return dbConnection.Query<int>("SELECT last_insert_id();").SingleOrDefault();
+            }
+        }
+
         public List<Competition> AllCompetitions()
         {
             using (IDbConnection dbConnection = Connection) {
@@ -34,7 +48,7 @@ namespace Hackathon.Factories
             }
         }
 
-        public IEnumerable<Competition> GetCurrentCompetitions(int userId) 
+        public IEnumerable<Competition> GetCurrentCompetitionsToJoin(int userId) 
         {
             using (IDbConnection dbConnection = Connection) {
                 string query = $"SELECT * FROM competitions WHERE end > now() AND competitionId NOT IN (SELECT CompetitionId FROM teams JOIN studentTeams ON teams.TeamId = studentTeams.TeamId WHERE studentTeams.StudentId = {userId});";
@@ -43,48 +57,14 @@ namespace Hackathon.Factories
             }
         }
 
-        public IEnumerable<Team> GetStudentTeams(int userId)
+        public IEnumerable<Competition> GetCurrentCompetitionsToVote(int userId) 
         {
             using (IDbConnection dbConnection = Connection) {
-                string query = $"SELECT * FROM studentTeams JOIN teams ON studentTeams.TeamId = teams.TeamId JOIN competitions ON teams.CompetitionId = competitions.CompetitionId WHERE StudentId = {userId} AND DATE_ADD(competitions.end, INTERVAL 1 HOUR) > now();";
+                string query = $"SELECT competitions.* FROM students JOIN monthlyLangStacks ON CurrStackId=monthlyLangStacks.MonthlyLangStackId JOIN monthlylangstackcompetitions ON monthlylangstacks.MonthlyLangStackId=monthlylangstackcompetitions.MonthlyLangStackId JOIN competitions ON monthlylangstackcompetitions.CompetitionId=competitions.CompetitionId WHERE students.UserId={userId};";
+                // string query = $"SELECT * FROM competitions WHERE DATE_ADD(end, INTERVAL 1 HOUR) > now() AND competitionId NOT IN (SELECT CompetitionId FROM teams JOIN studentTeams ON teams.TeamId = studentTeams.TeamId WHERE studentTeams.StudentId = {userId});";
                 dbConnection.Open();
-                return dbConnection.Query<StudentTeam, Team, Competition, Team>(query, (st, t, c) => { t.Competition=c; return t; }, splitOn: "TeamId, CompetitionId");
-            }
-        }
-
-        public Team GetTeam(int teamId, int userId)
-        {
-            using (IDbConnection dbConnection = Connection) {
-                string query = $"SELECT * FROM teams JOIN studentteams ON studentteams.teamid=teams.teamid WHERE studentteams.studentid={userId} AND teams.teamid={teamId};";
-                dbConnection.Open();
-                return dbConnection.Query<Team, StudentTeam, Team>(query, (t, st) => { return t; }, splitOn: "TeamId").SingleOrDefault();
-            }
-        }
-
-        public int GetStudentTeamId(int userId, int compId)
-        {
-            using (IDbConnection dbConnection = Connection) {
-                string query = $"SELECT studentteams.TeamId FROM studentteams JOIN teams ON studentteams.teamId = teams.TeamId WHERE studentteams.studentid={userId} AND teams.CompetitionId={compId};";
-                dbConnection.Open();
-                return dbConnection.Query<int>(query).SingleOrDefault();
-            }
-        }
-
-        public void SaveVote(int userId, int compId, int teamId) 
-        {
-            using (IDbConnection dbConnection = Connection) {
-                string query = $"INSERT INTO studentsCompetitionVotes (UserId, CompetitionId, TeamId) VALUES ({userId}, {compId}, {teamId});";
-                dbConnection.Open();
-                dbConnection.Execute(query);
-            }
-        }
-
-        public StudentCompetitionVote GetVote(int userId, int compId)
-        {
-            using (IDbConnection dbConnection = Connection) {
-                string query = $"SELECT * FROM studentsCompetitionVotes WHERE UserId={userId} AND CompetitionId={compId};";
-                dbConnection.Open();
-                return dbConnection.Query<StudentCompetitionVote>(query).SingleOrDefault();
+                // return dbConnection.Query<Student, MonthlyLangStack, MonthlyLangStackCompetition, Competition, Competition>(query, (s, mls, mlsc, c) => { return c; }, splitOn: "CurrStackId, MonthlyLangStackId, CompetitionId, CompetitionId");
+                return dbConnection.Query<Competition>(query);
             }
         }
 
@@ -107,15 +87,68 @@ namespace Hackathon.Factories
             }
         }
 
-        public int SaveCompetition(Competition c)
+        //************************************************//
+        //******************* TEAMS **********************//
+        //************************************************//
+
+        public IEnumerable<Team> GetStudentTeams(int userId)
         {
             using (IDbConnection dbConnection = Connection) {
-                string query = "INSERT INTO competitions (CompetitionName, MaxSize, Start, End, CompetitionTypeId) VALUES (@CompetitionName, @MaxSize, @Start, @End, @CompetitionTypeId);";
+                string query = $"SELECT * FROM studentTeams JOIN teams ON studentTeams.TeamId = teams.TeamId JOIN competitions ON teams.CompetitionId = competitions.CompetitionId WHERE StudentId = {userId} AND DATE_ADD(competitions.end, INTERVAL 1 HOUR) > now();";
                 dbConnection.Open();
-                dbConnection.Execute(query, c);
-                return dbConnection.Query<int>("SELECT last_insert_id();").SingleOrDefault();
+                return dbConnection.Query<StudentTeam, Team, Competition, Team>(query, (st, t, c) => { t.Competition=c; return t; }, splitOn: "TeamId, CompetitionId");
             }
         }
+
+        public Team GetTeam(int teamId, int userId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM teams JOIN studentteams ON studentteams.teamid=teams.teamid WHERE studentteams.studentid={userId} AND teams.teamid={teamId};";
+                dbConnection.Open();
+                return dbConnection.Query<Team, StudentTeam, Team>(query, (t, st) => { return t; }, splitOn: "TeamId").SingleOrDefault();
+            }
+        }
+
+        public Team GetStudentTeam(int userId, int compId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT teams.* FROM studentteams JOIN teams ON studentteams.teamId = teams.TeamId WHERE studentteams.studentid={userId} AND teams.CompetitionId={compId};";
+                dbConnection.Open();
+                return dbConnection.Query<Team>(query).SingleOrDefault();
+            }
+        }
+
+        public int GetStudentTeamId(int userId, int compId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT studentteams.TeamId FROM studentteams JOIN teams ON studentteams.teamId = teams.TeamId WHERE studentteams.studentid={userId} AND teams.CompetitionId={compId};";
+                dbConnection.Open();
+                return dbConnection.Query<int>(query).SingleOrDefault();
+            }
+        }
+
+        //************************************************//
+        //******************* VOTES **********************//
+        //************************************************//
+
+        public void SaveVote(int userId, int compId, int teamId) 
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"INSERT INTO studentsCompetitionVotes (UserId, CompetitionId, TeamId) VALUES ({userId}, {compId}, {teamId});";
+                dbConnection.Open();
+                dbConnection.Execute(query);
+            }
+        }
+
+        public StudentCompetitionVote GetVote(int userId, int compId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM studentsCompetitionVotes WHERE UserId={userId} AND CompetitionId={compId};";
+                dbConnection.Open();
+                return dbConnection.Query<StudentCompetitionVote>(query).SingleOrDefault();
+            }
+        }
+
 
         public void SaveMonthlyLangComp(MonthlyLangStackCompetition m) {
             using (IDbConnection dbConnection = Connection) {

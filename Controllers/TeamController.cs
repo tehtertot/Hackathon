@@ -25,8 +25,13 @@ namespace Hackathon.Controllers
         {
             if (CheckUser())
             {
-                ViewBag.currentCompetitions = _compFactory.GetCurrentCompetitions((int)HttpContext.Session.GetInt32("UserId"));
-                ViewBag.currentTeams = _compFactory.GetStudentTeams((int)HttpContext.Session.GetInt32("UserId"));
+                ViewBag.currentCompetitions = _compFactory.GetCurrentCompetitionsToJoin((int)HttpContext.Session.GetInt32("UserId"));
+                IEnumerable<Competition> votingCompetitions = _compFactory.GetCurrentCompetitionsToVote((int)HttpContext.Session.GetInt32("UserId"));
+                foreach (Competition c in votingCompetitions)
+                {
+                    c.StudentTeam = _compFactory.GetStudentTeam((int)HttpContext.Session.GetInt32("UserId"), c.CompetitionId);
+                }
+                ViewBag.votingCompetitions = votingCompetitions;
                 return View();
             }
             else 
