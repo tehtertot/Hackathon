@@ -125,17 +125,34 @@ namespace Hackathon.Controllers
 
         public IActionResult ViewCompetition(int compId) 
         {
-            Competition c = _compFactory.GetCompetition(compId);
-            //page displaying competition details, including teams and players
-            //allowing 5 minutes per presentation
-            if (c.End > DateTime.Now.AddMinutes(c.Teams.Count*5))
+            if (CheckUser())
             {
-                return View("ShowCompetition", c);
-            }
+                Competition c = _compFactory.GetCompetition(compId);
+                //page displaying competition details, including teams and players
+                //allowing 5 minutes per presentation
+                if (c.End > DateTime.Now.AddMinutes(c.Teams.Count*5))
+                {
+                    ViewBag.message = "Voting will begin after presentations...";
+                    return View("ShowCompetition", c);
+                }
 
-            //viewing for voting
-            ViewBag.userTeamId = _compFactory.GetStudentTeamId((int)HttpContext.Session.GetInt32("UserId"), compId);
-            return View("Vote", c);
+                //viewing for voting
+                StudentCompetitionVote hasVoted = _compFactory.GetVote((int)HttpContext.Session.GetInt32("UserId"), compId);
+                if (hasVoted == null)
+                {
+                    ViewBag.userTeamId = _compFactory.GetStudentTeamId((int)HttpContext.Session.GetInt32("UserId"), compId);
+                    return View("Vote", c);
+                }
+                else
+                {
+                    ViewBag.message = "Your vote is in!";
+                    return View("ShowCompetition", c);
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost]
@@ -145,11 +162,11 @@ namespace Hackathon.Controllers
                 int studTeam = _compFactory.GetStudentTeamId((int)HttpContext.Session.GetInt32("UserId"), compId);
                 if (team == studTeam) {
                     TempData["error"] = "Cannot vote for yourself!";
-                    return RedirectToAction("ViewCompetition");
+                    return RedirectToAction("ViewCompetition", new {compId = compId});
                 }
-                _compFactory.SaveVote((int)HttpContext.Session.GetInt32("UserId"), team, studTeam);
+                _compFactory.SaveVote((int)HttpContext.Session.GetInt32("UserId"), compId, team);
 
-                return RedirectToAction("ViewCompetition");
+                return RedirectToAction("ViewCompetition", new {compId = compId});
             }
             else {
                 return RedirectToAction("Index", "Home");

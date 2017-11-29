@@ -5,17 +5,19 @@
 @model Hackathon.Models.Competition
 
 <h2>@Model.CompetitionName</h2>
-<h4>START: @Model.Start.ToString("f")</h4>
-<h4>END: @Model.End.ToString("f")</h4>
+<h4><span class="show-time">START:</span>@Model.Start.ToString("f")</h4>
+<h4><span class="show-time">END:</span>@Model.End.ToString("f")</h4>
 <hr>
-<p>Voting will begin after presentations...</p>
+<p class="orangemessage">@ViewBag.message</p>
 <h4>Teams</h4>
 <ul>
 @foreach (var t in Model.Teams){
-    <li>@t.TeamName - @t.ProjectTitle (
+    <li>@t.TeamName - @t.ProjectTitle
+        <ul>
         @foreach (var s in t.Students) {
-            <span>  @s.UserInfo.FirstName  </span>
+            <li>  @s.UserInfo.FirstName  </li>
         }
-    )</li>
+        </ul>
+    </li>
 }
 </ul>

@@ -46,7 +46,7 @@ namespace Hackathon.Factories
         public IEnumerable<Team> GetStudentTeams(int userId)
         {
             using (IDbConnection dbConnection = Connection) {
-                string query = $"SELECT * FROM studentTeams JOIN teams ON studentTeams.TeamId = teams.TeamId JOIN competitions ON teams.CompetitionId = competitions.CompetitionId WHERE StudentId = {userId} AND competitions.end > now();";
+                string query = $"SELECT * FROM studentTeams JOIN teams ON studentTeams.TeamId = teams.TeamId JOIN competitions ON teams.CompetitionId = competitions.CompetitionId WHERE StudentId = {userId} AND DATE_ADD(competitions.end, INTERVAL 1 HOUR) > now();";
                 dbConnection.Open();
                 return dbConnection.Query<StudentTeam, Team, Competition, Team>(query, (st, t, c) => { t.Competition=c; return t; }, splitOn: "TeamId, CompetitionId");
             }
@@ -70,12 +70,21 @@ namespace Hackathon.Factories
             }
         }
 
-        public void SaveVote(int userId, int teamId, int studTeam) 
+        public void SaveVote(int userId, int compId, int teamId) 
         {
             using (IDbConnection dbConnection = Connection) {
-                string query = $"UPDATE studentteams SET studentvoteteamid={teamId} WHERE UserId={userId} AND TeamId={studTeam};";
+                string query = $"INSERT INTO studentsCompetitionVotes (UserId, CompetitionId, TeamId) VALUES ({userId}, {compId}, {teamId});";
                 dbConnection.Open();
                 dbConnection.Execute(query);
+            }
+        }
+
+        public StudentCompetitionVote GetVote(int userId, int compId)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM studentsCompetitionVotes WHERE UserId={userId} AND CompetitionId={compId};";
+                dbConnection.Open();
+                return dbConnection.Query<StudentCompetitionVote>(query).SingleOrDefault();
             }
         }
 

@@ -30,7 +30,7 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                     @if (ViewBag.UserId != null) {
+                    @if (ViewData["UserId"] != null) {
                         <li><a asp-area="" asp-controller="Team" asp-action="Index">Home</a></li>
                     }
                     @if (ViewBag.UserLevel == 9) {
@@ -38,7 +38,7 @@
                     } 
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    @if (ViewBag.UserId == null) {
+                    @if (ViewData["UserId"] == null) {
                         <li><a asp-area="" asp-controller="Home" asp-action="ShowLogin">Login</a></li>
                     }
                     else {

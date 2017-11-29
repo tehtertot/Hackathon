@@ -94,6 +94,7 @@ namespace Hackathon.Controllers
             }
         }
 
+        [HttpPost]
         public IActionResult AddCompetition(string name, int type, int size, DateTime startdate, DateTime starttime, DateTime enddate, DateTime endtime, List<int> stacks) 
         {
             if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9)
