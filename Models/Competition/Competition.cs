@@ -22,10 +22,11 @@ namespace Hackathon.Models
 
         public int CompetitionTypeId { get; set; }
         public CompetitionType CompType { get; set; }
-
+        
         public List<Team> Teams { get; set; }
 
         public Team StudentTeam { get; set; }
+
 
         public Competition()
         {

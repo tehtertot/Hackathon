@@ -135,10 +135,19 @@ namespace Hackathon.Controllers
                 Competition c = _compFactory.GetCompetition(compId);
                 //page displaying competition details, including teams and players
                 //allowing 5 minutes per presentation
-                if (c.End > DateTime.Now.AddMinutes(c.Teams.Count*5))
+                if (c.End.AddMinutes(c.Teams.Count*5) > DateTime.Now)
                 {
                     ViewBag.message = "Voting will begin after presentations...";
                     return View("ShowCompetition", c);
+                }
+
+                // if (c.End.AddDays(1) < DateTime.Now)
+                if (c.End.AddHours(2) < DateTime.Now)
+                {
+                    Competition cWithWinners = _compFactory.GetCompetitionWinners(compId);
+                    // cWithWinners.Teams.OrderByDescending(t => t.VotesScored);
+                    ViewBag.message = "FINAL RESULTS";
+                    return View("ShowCompetition", cWithWinners);
                 }
 
                 //viewing for voting

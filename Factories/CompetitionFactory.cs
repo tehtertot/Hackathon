@@ -87,6 +87,25 @@ namespace Hackathon.Factories
             }
         }
 
+        public Competition GetCompetitionWinners(int id)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM competitions WHERE CompetitionId={id};";
+                dbConnection.Open();
+                Competition comp = dbConnection.Query<Competition>(query).SingleOrDefault();
+                string query2 = $"SELECT * FROM teams WHERE teams.CompetitionId={id};";
+                List<Team> Teams = dbConnection.Query<Team>(query2).ToList();
+                foreach (Team t in Teams)
+                {
+                    string query3 = $"SELECT Count(*) FROM studentsCompetitionVotes WHERE TeamId = {t.TeamId};";
+                    t.VotesScored = dbConnection.Query<int>(query3).SingleOrDefault();
+                }
+                Teams = Teams.OrderByDescending(t => t.VotesScored).ToList();
+                comp.Teams = Teams;
+                return comp;
+            }
+        }
+
         //************************************************//
         //******************* TEAMS **********************//
         //************************************************//

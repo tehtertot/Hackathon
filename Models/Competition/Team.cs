@@ -13,6 +13,8 @@ namespace Hackathon.Models
 
         public List<Student> Students { get; set; }
 
+        public int VotesScored { get; set; }
+
         public Team() {
             Students = new List<Student>();
         }
