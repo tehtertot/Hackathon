@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Hackathon";
+}
+
+@model Hackathon.Models.Competition
+
+<h2>@Model.CompetitionName</h2>
+<h4><span class="show-time">START:</span>@Model.Start.ToString("f")</h4>
+<h4><span class="show-time">END:</span>@Model.End.ToString("f")</h4>
+<hr>
+
+<div class="col-sm-7">
+    <table class="table table-hover">
+        <tr>
+            <th colspan="3" class="orangemessage">RESULTS</th>
+        </tr>
+        <tr>
+            <th>Votes</th>
+            <th>Team</th>
+            <th>Project</th>
+        </tr>
+        @foreach (var t in Model.Teams){
+            <tr>
+                <td>@t.VotesScored</td>
+                <td>@t.TeamName</td>
+                <td>@t.ProjectTitle</td>
+            </tr>
+        }
+        </table>
+</div>
+<div class="row"></div>

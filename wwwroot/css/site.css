@@ -61,6 +61,7 @@ textarea {
 .orangemessage {
     color: orange;
     font-weight: bold;
+    text-align: center;
 }
 
 .show-time {

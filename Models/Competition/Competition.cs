@@ -22,6 +22,8 @@ namespace Hackathon.Models
 
         public int CompetitionTypeId { get; set; }
         public CompetitionType CompType { get; set; }
+
+        public int CreatorId { get; set; }
         
         public List<Team> Teams { get; set; }
 

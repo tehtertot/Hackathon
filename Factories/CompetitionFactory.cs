@@ -87,6 +87,15 @@ namespace Hackathon.Factories
             }
         }
 
+        public IEnumerable<Competition> GetMyCompetitions(int id)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM competitions WHERE CreatorId={id};";
+                dbConnection.Open();
+                return dbConnection.Query<Competition>(query);
+            }
+        }
+
         public Competition GetCompetitionWinners(int id)
         {
             using (IDbConnection dbConnection = Connection) {

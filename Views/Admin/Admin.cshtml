@@ -3,5 +3,15 @@
 }
 <h3>Admin</h3>
 
+<h3>Competitions</h3>
 <p><a asp-controller="Admin" asp-action="Competition">Add New Competition</a></p>
+<h4>My Competitions</h4>
+<ul>
+@foreach (var c in ViewBag.AllMyCompetitions) {
+    <li><a asp-controller="Admin" asp-action="ShowCompetition" asp-route-compId="@c.CompetitionId">@c.CompetitionName</a></li>
+
+}
+</ul>
+
+<h3>Students</h3>
 <p><a asp-controller="Admin" asp-action="AddStudents">Add Students</a></p>

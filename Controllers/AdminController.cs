@@ -25,6 +25,7 @@ namespace Hackathon.Controllers
         public IActionResult AdminNav() {
             if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9)
             {
+                ViewBag.AllMyCompetitions = _compFactory.GetMyCompetitions((int)HttpContext.Session.GetInt32("UserId"));
                 return View("Admin");
             }
             else
@@ -76,7 +77,20 @@ namespace Hackathon.Controllers
         }
 
         // /////////////// MANAGE COMPETITIONS //////////////////////////////////////// //
-        public IActionResult Competition() {
+        public IActionResult ShowCompetition(int compId) 
+        {
+            if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9)
+            {
+                Competition c = _compFactory.GetCompetitionWinners(compId);
+                return View(c);
+            }
+            else
+            {
+                return View("Index", "Home");
+            }
+        }
+        public IActionResult Competition()
+        {
             if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9)
             {
                 ViewBag.types = _compFactory.AllCompetitionTypes();
