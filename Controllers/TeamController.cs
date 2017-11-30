@@ -141,8 +141,7 @@ namespace Hackathon.Controllers
                     return View("ShowCompetition", c);
                 }
 
-                // if (c.End.AddDays(1) < DateTime.Now)
-                if (c.End.AddHours(2) < DateTime.Now)
+                if (c.End.AddDays(1) < DateTime.Now)
                 {
                     Competition cWithWinners = _compFactory.GetCompetitionWinners(compId);
                     // cWithWinners.Teams.OrderByDescending(t => t.VotesScored);
