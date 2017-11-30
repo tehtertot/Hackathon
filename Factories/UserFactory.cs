@@ -33,6 +33,24 @@ namespace Hackathon.Factories
             }
         }
 
+        public IEnumerable<Student> GetAllStudents()
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = "SELECT * FROM students JOIN users ON students.UserId=users.UserId ORDER BY users.FirstName, users.LastName;";
+                dbConnection.Open();
+                return dbConnection.Query<Student>(query);
+            }
+        }
+
+        public Student GetStudent(int id)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = $"SELECT * FROM students JOIN users ON students.UserId=users.UserId WHERE users.UserId={id};";
+                dbConnection.Open();
+                return dbConnection.Query<Student>(query).SingleOrDefault();
+            }
+        }
+
         public User GetUserById(int id)
         {
             using (IDbConnection dbConnection = Connection) {
@@ -48,6 +66,17 @@ namespace Hackathon.Factories
                 string query = "UPDATE users SET Password=@Password, ChangePassword=0 WHERE UserId=@UserId";
                 dbConnection.Open();
                 dbConnection.Execute(query, u);
+            }
+        }
+
+        public void UpdateStudent(Student s)
+        {
+            using (IDbConnection dbConnection = Connection) {
+                string query = "INSERT INTO users SET FirstName=@FirstName, LastName=@LastName, Email=@Email, Password=@Password, ChangePassword=1;";
+                string query2 = "INSERT INTO users SET StartDate=@StartDate, EndDate=@EndDate;";
+                dbConnection.Open();
+                dbConnection.Execute(query, s);
+                dbConnection.Execute(query2, s);
             }
         }
 
@@ -102,7 +131,7 @@ namespace Hackathon.Factories
             using (IDbConnection dbConnection = Connection) {
                 string query = $"SELECT * FROM users JOIN students ON users.UserId = students.UserId WHERE students.CurrStackId = {StackId} AND students.UserId != {UserId} AND students.UserId NOT IN (SELECT StudentId FROM teams JOIN studentTeams ON teams.TeamId = studentTeams.TeamId WHERE CompetitionId = {CompId}) ORDER BY users.FirstName;";
                 dbConnection.Open();
-                return dbConnection.Query<Student, User, Student>(query, (s, u) => { s.UserInfo = u; return s; }, splitOn: "UserId");
+                return dbConnection.Query<Student>(query);
             }
         }
     }

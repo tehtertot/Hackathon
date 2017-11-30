@@ -18,7 +18,7 @@
             <input type="radio" name="team" value=@t.TeamId><h5 class="teamname"> @t.TeamName - @t.ProjectTitle</h5>
             <ul>
             @foreach (var s in t.Students) {
-                <li>@s.UserInfo.FirstName</li>
+                <li>@s.FirstName</li>
             }
             </ul>
         }

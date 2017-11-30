@@ -100,14 +100,5 @@ namespace Hackathon.Controllers
             ViewData["UserLevel"] = 0;
             return View();
         }
-
-        // private void HashAllPasswords() {
-        //     IEnumerable<User> allUsers = _userFactory.GetAll();
-        //     PasswordHasher<User> Hasher = new PasswordHasher<User>();
-        //     foreach (User u in allUsers) {
-        //         u.Password = Hasher.HashPassword(u, u.Password);
-        //         _userFactory.UpdateUser(u);
-        //     }
-        // }
     }
 }

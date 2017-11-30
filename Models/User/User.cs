@@ -7,14 +7,19 @@ namespace Hackathon.Models
         [Key]
         public int UserId { get; set; }
 
+        [Display(Name="First Name")]
         public string FirstName { get; set; }
         
+        [Display(Name="Last Name")]
         public string LastName { get; set; }
         
         [EmailAddress]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
         
+        [DataType(DataType.Password)]
         public string Password { get; set; }
+
         public bool ChangePassword { get; set; }
         
         public int AccessLevelId { get; set; }

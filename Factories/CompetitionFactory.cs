@@ -81,7 +81,7 @@ namespace Hackathon.Factories
                 foreach (Team t in c.Teams)
                 {
                     string query3 = $"SELECT * FROM studentteams JOIN students ON studentteams.studentid = students.userid JOIN users ON students.userid = users.userid WHERE TeamId={t.TeamId};";
-                    t.Students = dbConnection.Query<StudentTeam, Student, User, Student>(query3, (st, s, u) => { s.UserInfo = u; return s; }, splitOn:"UserId").ToList();
+                    t.Students = dbConnection.Query<Student>(query3).ToList();
                 }
                 return c;
             }

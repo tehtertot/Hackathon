@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Hackathon.Factories;
 using Hackathon.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hackathon.Controllers
@@ -35,10 +37,51 @@ namespace Hackathon.Controllers
         }
 
         // /////////////// MANAGE STUDENTS //////////////////////////////////////////// //
-        public IActionResult AddStudents() {
+        public IActionResult EditStudents() {
             if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9) 
             {
-                return View();
+                IEnumerable<Student> allStudents = _userFactory.GetAllStudents();
+                return View(allStudents);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        public IActionResult EditStudent(int id) {
+            if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9) 
+            {
+                Student student = _userFactory.GetStudent(id);
+                return View(student);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public void UpdateStudent(Student s) 
+        {
+            PasswordHasher<Student> Hasher = new PasswordHasher<Student>();
+            s.Password = Hasher.HashPassword(s, s.Password);   
+            Student fromDb = _userFactory.GetStudent(s.UserId);
+            PropertyInfo[] properties = typeof(Student).GetProperties();
+            foreach (PropertyInfo p in properties)
+            {
+                if (p.GetValue(s) != p.GetValue(fromDb))
+                {
+                    p.SetValue(fromDb, p.GetValue(s));
+                }
+            }
+            _userFactory.UpdateStudent(fromDb);
+        }
+
+        public IActionResult ShowAllStudents() {
+            if (CheckUser() && (int)HttpContext.Session.GetInt32("AccessLevel") == 9) 
+            {
+                return View("AllStudents");
             }
             else
             {
@@ -175,5 +218,14 @@ namespace Hackathon.Controllers
                 return false;
             }
         }
+
+        // private void HashAllPasswords() {
+        //     IEnumerable<User> allUsers = _userFactory.GetAll();
+        //     PasswordHasher<User> Hasher = new PasswordHasher<User>();
+        //     foreach (User u in allUsers) {
+        //         u.Password = Hasher.HashPassword(u, u.Password);
+        //         _userFactory.UpdateUser(u);
+        //     }
+        // }
     }
 }
